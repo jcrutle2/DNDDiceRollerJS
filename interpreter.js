@@ -6,7 +6,7 @@
  */
 
 function interpret (parsed) {
-    if (parsed.prompt === "roll") {
+    if (parsed.prompt === "roll" && parsed.sum) {
         let sum = parsed.sum;
         let i = 1;
         while (true) {

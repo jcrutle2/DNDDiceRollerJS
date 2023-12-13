@@ -6,14 +6,29 @@
  */
 
 /* 
+ *
  *  IMPORT SECTION
+ *
  */ 
-const parser = require('./parser.cjs');
+const parser = require('./parser.js');
 const prompt = require('prompt-sync')();
-const interpreter = require('./interpreter.cjs')
+const interpreter = require('./interpreter.js')
   
+
 /*
+ *
+ * PROGRAM BOOTUP
+ *
+ */
+
+console.log("\nDND Dice Roller JS, v0.1");
+console.log("Enter \"roll dX\" to roll a die, where X is the size of the die. Type \"help\" for help\n");
+
+
+/*
+ *
  *  TERMINAL INPUT
+ * 
  */ 
 while (true) {
   const txt = prompt("Enter Command: ");
