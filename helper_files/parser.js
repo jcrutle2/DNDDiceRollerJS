@@ -4,6 +4,23 @@ module.exports = /*
  * PARSER: Takes in string entered by user, returns an object with the appropriate attributes
  * Created: Caleb Rutledge, 12/13/2023
  * 
+ * FILE RETURNS OBJECT: Object data is as specified
+ *    
+ *    NAME                        TYPE                            DESCRIPTION
+ * 
+ * GENERIC COMMAND:
+ *    .prompt = "prompt"          (string)                        cmd specified by user
+ *    .args(i) = "arg(i)"         (string)                        cmd argument (i)
+ * 
+ * ROLL COMMAND: 
+ *    .sum = diceTotal            (int)                           sum of all dice rolls WITHOUT .add(i) considered
+ *    .numRolls = #diceRolled     (int)                           number of dice rolled
+ *    .roll(i) = roll(i)          (int)                           value of roll (i) 
+ *    .add(i) = add(i)            (int or string)                 number or attribute to add
+ *  
+ * 
+ * NOTE: (i) is standin for number. Will often have multiple values: Ex. If you roll 6 die, there will be .roll1 - .roll6.
+ * 
  * http://pegjs.org/
  */
 (function() {

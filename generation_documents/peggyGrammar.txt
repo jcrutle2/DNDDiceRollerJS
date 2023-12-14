@@ -1,0 +1,87 @@
+// Controls which input function is read
+codeLine
+ = r:rollArgs? w:genArg?{
+ 	if (r) {
+    	return r;
+    }
+    
+    else {
+    	return w;
+    }
+ }
+ 
+/*
+ *
+ * Input Functions
+ *
+ */
+
+// controls arguments for roll command
+rollArgs
+ = "roll" _ rep:integer? r:Random _? a:(_? "+" _? add:(wordOrInt))* _? {
+ 
+ 	let obj = {
+    	prompt:"roll",
+    	sum:0,
+        numRolls: (!rep) ? 1 : rep,
+    }
+    
+    for (let i = 1; i <= obj.numRolls; i++) {
+    	obj["roll" + i] = Math.floor(r * Math.random() + 1);
+        obj.sum += obj["roll" + i];
+    }
+    
+    if(a) {
+    	for (let i = 0; i < a.length; i++) {
+        	obj["add" + (i+1)] = a[i][3];
+        }
+    }
+    
+    return obj;
+ }
+ 
+ // generic args for generic command
+ genArg 
+  = t:(word _? integer? _?)+ {
+  	let myObj = {
+    	prompt: t[0][0],
+    	args: 0,
+    };
+    for (let i = 1; i < t.length; i++) {
+    	myObj["arg" + i] = t[i][0];
+        myObj.args++;
+    }
+    return myObj;
+  }
+    
+/*
+ *
+ *  SIMPLE TYPES
+ *
+ */
+ 
+ // returns dice roll: format "d" followed by max of roll. min is 1.
+Random 
+    = "d" d:integer* _{ 
+      return d
+    }
+ 
+ // returns 1 word or 1 integer, but not both
+ wordOrInt "word-or-int"
+    = w:word? i:integer? _	{
+        if ((w && i) || (!w && !i)) return null;
+        if (w) return w;
+        if (i) return i;
+    }
+ 
+// digit 0-9
+integer "simple number"
+    = digits:[0-9]+ { return parseInt(digits.join(""), 10); }
+  
+// set of characters beginning with letter, can contain number
+word "word"
+    = char:[a-zA-Z] chars:[a-zA-Z0-9]* { return char + chars.join("") }
+  
+// blank space
+_ "whitespace"
+    = [ \t\n\r]*

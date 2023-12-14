@@ -10,9 +10,9 @@
  *  IMPORT SECTION
  *
  */ 
-const parser = require('./parser.js');
+const parser = require('./helper_files/parser.js');
 const prompt = require('prompt-sync')();
-const interpreter = require('./interpreter.js')
+const interpreter = require('./helper_files/interpreter.js')
   
 
 /*

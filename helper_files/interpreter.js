@@ -6,7 +6,9 @@
  */
 
 function interpret (parsed) {
+    // Interprets roll commands
     if (parsed.prompt === "roll" && parsed.sum) {
+        // determines final sum of roll
         let sum = parsed.sum;
         let i = 1;
         while (true) {
@@ -14,13 +16,23 @@ function interpret (parsed) {
                 sum += parsed["add" + i];
             }
             else break;
-
             i++;
         }
-        let str = "You rolled " + sum + ". ";
 
-        if(parsed.add1) {
-            str += parsed.sum + " + " + parsed.add1;
+        // creates return string
+        let str = "You rolled " + sum + ". ";;
+        if (parsed.numRolls != 1) {
+            str += "(" + parsed["roll" + 1];
+            for (let i = 2; i <= parsed.numRolls; i++) {
+                str += " + " + parsed["roll" + i];
+            }
+            str += ")";
+            if (parsed.add1) {
+                str += " + " + parsed.add1;
+            }
+        }
+        else if(parsed.add1) {
+            str += "(" + parsed.sum + ")" + " + " + parsed.add1;
         }
         i = 2;
         while (true) {
