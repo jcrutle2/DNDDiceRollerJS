@@ -10,9 +10,11 @@
  *  IMPORT SECTION
  *
  */ 
-const parser = require('./helper_files/parser.js');
-const prompt = require('prompt-sync')();
-const interpreter = require('./helper_files/interpreter.js')
+const parser = require('./helper_files/parser.js');                     //parses user input
+const interpreter = require('./helper_files/interpreter.js');           //interprets user input
+const character = require('./helper_files/character.js');               //deals with character data
+const prompt = require('prompt-sync')();                                //gets user input
+const fs = require('fs');                                               //filesystem access
   
 
 /*
