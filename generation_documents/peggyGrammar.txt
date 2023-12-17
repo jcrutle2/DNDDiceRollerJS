@@ -18,7 +18,7 @@ codeLine
 
 // controls arguments for roll command
 rollArgs
- = "roll" _ rep:integer? r:Random _? a:(_? "+" _? add:(wordOrInt))* _? {
+ = "roll" _ rep:integer? r:Random _? a:(_? op _? (wordOrInt))* _? {
  
  	let obj = {
     	prompt:"roll",
@@ -31,10 +31,30 @@ rollArgs
         obj.sum += obj["roll" + i];
     }
     
-    if(a) {
-    	for (let i = 0; i < a.length; i++) {
-        	obj["add" + (i+1)] = a[i][3];
+    // add attributes to object based on operator
+    let addPlace = 1;
+    let subPlace = 1;
+    let mulPlace = 1;
+    let divPlace = 1;
+    for (let i = 0; i < a.length; i++) {
+    	if (a[i][1] === "+") {
+        	obj["add" + (addPlace)] = a[i][3];
+            addPlace++;
         }
+    	if (a[i][1] === "-") {
+        	obj["sub" + (subPlace)] = a[i][3];
+            subPlace++;
+        }
+        if (a[i][1] === "*") {
+        	obj["mul" + (mulPlace)] = a[i][3];
+            mulPlace++;
+        }
+        if (a[i][1] === "/") {
+        	obj["div" + (divPlace)] = a[i][3];
+            divPlace++;
+        }
+        if (a[i][1] == null) 
+        	return null;
     }
     
     return obj;
@@ -42,7 +62,7 @@ rollArgs
  
  // generic args for generic command
  genArg 
-  = t:(word _? integer? _?)+ {
+  = t:(arg _?)+ {
   	let myObj = {
     	prompt: t[0][0],
     	args: 0,
@@ -81,6 +101,14 @@ integer "simple number"
 // set of characters beginning with letter, can contain number
 word "word"
     = char:[a-zA-Z] chars:[a-zA-Z0-9]* { return char + chars.join("") }
+
+// set of characters seperated by space
+arg "arg" 
+	= word:[^ ]+ {return word.join("")}
+    
+// arithmetical operators
+op "operator"
+	= t:[+-/*] {return t};
   
 // blank space
 _ "whitespace"

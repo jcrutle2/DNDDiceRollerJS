@@ -38,68 +38,63 @@ function cmdRoll (parsed) {
     // determines final sum of roll
     let sum = parsed.sum;
 
-    // add additive terms to roll
-    let i = 1;
-    while (true) {
-        if(interpretAttribute(parsed["add" + i])) {
-            sum += Number(interpretAttribute(parsed["add" + i]));
-        }
-        else break;
+    // creates second component of return string
+    let sumString = "";
+
+    // find total of dice
+    sumString += parsed.roll1;
+    let diceMax = parsed.numRolls;
+    let i;
+    for(i = 2; i <= diceMax; i++) {
+        sumString += " + " + parsed["roll" + i];
+    }
+    sumString = "(" + sumString + ")";
+
+    // increase each roll by .add(i)
+    i = 1;
+    while (interpretAttribute(parsed["add" + i])) {
+        sumString += " + " + interpretAttribute(parsed["add" + i]);
+        sum += Number(interpretAttribute(parsed["add" + i]));
         i++;
     }
 
-    // multiply roll
+    // decrease each roll by .sub(i)
     i = 1;
-    while (true) {
-        if(interpretAttribute(parsed["mul" + i])) {
+    while (interpretAttribute(parsed["sub" + i])) {
+        sumString += " - " + interpretAttribute(parsed["sub" + i]);
+        sum -= Number(interpretAttribute(parsed["sub" + i]));
+        i++;
+    }
+
+    // add brackets if applicable
+    if(parsed.mul1 || parsed.div1) {
+        if (parsed.add1 || parsed.sub1)
+            sumString = "[" + sumString + "]";
+        // multiply roll by each .mul(i)
+        i = 1;
+        while (interpretAttribute(parsed["mul" + i])) {
+            sumString += " * " + interpretAttribute(parsed["mul" + i]);
             sum *= Number(interpretAttribute(parsed["mul" + i]));
+            i++;
         }
-        else break;
-        i++;
-    }
 
-    // divide roll
-    i = 1;
-    while (true) {
-        if(interpretAttribute(parsed["div" + i])) {
+        // divide roll by each .div(i)
+        i = 1;
+        while (interpretAttribute(parsed["div" + i])) {
+            sumString += " / " + interpretAttribute(parsed["div" + i]);
             sum /= Number(interpretAttribute(parsed["div" + i]));
             sum = Math.floor(sum);
-        }
-        else break;
-        i++;
-    }
-
-    // creates return string
-    let str = "You rolled " + sum + ". ";;
-
-    // formats first elements of sum composition
-    if (parsed.numRolls != 1) {
-        str += "(" + parsed["roll" + 1];
-        for (let i = 2; i <= parsed.numRolls; i++) {
-            str += " + " + parsed["roll" + i];
-        }
-        str += ")";
-        if (parsed.add1) {
-            str += " + " + interpretAttribute(parsed.add1);
+            i++;
         }
     }
-    else if(parsed.add1) {
-        str += "(" + parsed.sum + ")" + " + " + interpretAttribute(parsed.add1);
-    }
-    else 
 
-    // formats additional elements of sum composition
-    i = 2;
-    while (true) {
-        if(parsed["add" + i]) {
-            str += " + " + interpretAttribute(parsed["add" + i]);
-        }
-        else break;
+    // creates first component of return string
+    const rollStr = "You rolled " + sum;
 
-        i++;
-    }
-
-
+    // if no components, return roll string
+    if (!parsed.roll2 && !parsed.add1 && !parsed.sub1 && !parsed.mul1 && !parsed.div1)
+        return rollStr + ".";
+    const str = rollStr + ": " + sumString;
     return str;
 }
 

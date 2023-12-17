@@ -13,6 +13,7 @@ const charDataFile = './user_data/char_data.json';                      //where 
 
 // creates new character
 function newChar (name) {
+    let charFile = getCharDataFile();
 
     // ensure charDataFile Exists
     if(!fs.existsSync(charDataFile) ) {
@@ -23,10 +24,15 @@ function newChar (name) {
         writeToCharDataFile(charObj);
     }
 
-    let charFile = getCharDataFile();
+    // ensure name does starts with letter
+    let firstChar = name.charAt(0);
+    if (!firstChar.match(/[a-z]/i)) {
+        return "ERROR: First character of name must be letter.";
+    }
+
+    // ensure character with this name doesn't currently exist
     let charMax = charFile.totalChar;
     let loopNumber = 1;
-
     while (loopNumber <= charMax) {
         let thisChar = charFile["char" + loopNumber];
         if (thisChar.name === name) {
@@ -35,20 +41,20 @@ function newChar (name) {
         loopNumber++;
     }
 
+    // create character
     console.log("Creating Character...");
     let charNumber = charMax + 1;
-
     charFile["char" + charNumber] = {
         name: name,
     }
 
+    // select character
     console.log("Selecting Character as Current Character...");
     charFile.currentChar = charNumber;
     charFile.totalChar = charNumber;
 
-
+    // write to memory
     writeToCharDataFile(charFile);
-
     return "Success!";
 }
 
@@ -123,20 +129,35 @@ function returnAttribute (str) {
 
 // selects a character
 function changeChar (char) {
-    let i;
-    let charFile = getCharDataFile();
-    const max = charFile.totalChar;
 
-    for (i = 1; i <= max; i++) {
-        const thisChar = charFile["char" + i];
-        if (thisChar.name === char) {
-            charFile.currentChar = i;
+    let charFile = getCharDataFile();
+
+    if (Number(char) != NaN) {
+        if (Number(char) <= charFile.totalChar) {
+            charFile.currentChar = Number(char);
+            thisChar = charFile["char" + charFile.currentChar];
             writeToCharDataFile(charFile);
-            return "Success! Current Character is " + char + ".";
+            return "Success! Current Character is " + thisChar.name + ".";
         }
     }
 
-    return "Error: Character " + char + " not found.";
+    if (typeof char === "string") {
+        let i;
+        const max = charFile.totalChar;
+    
+        for (i = 1; i <= max; i++) {
+            const thisChar = charFile["char" + i];
+            if (thisChar.name === char) {
+                charFile.currentChar = i;
+                writeToCharDataFile(charFile);
+                return "Success! Current Character is " + char + ".";
+            }
+        }
+    
+        return "Error: Character " + char + " not found.";
+    }
+
+    return "Error: Character not found."
 
 }
 
