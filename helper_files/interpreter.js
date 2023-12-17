@@ -22,22 +22,48 @@
 
 const character = require('./character.js');               //deals with character data
 
+// main function - interprets any valid input from parser
 function interpret (parsed) {
     // Interprets roll commands
     if (parsed.prompt === "roll" && parsed.sum) 
         return cmdRoll(parsed);
-    if (parsed.prompt === "char") 
+    else if (parsed.prompt === "char") 
         return cmdChar(parsed);
     else return "not yet implemented";
 }
 
+// if user entered "roll"
 function cmdRoll (parsed) {
+
     // determines final sum of roll
     let sum = parsed.sum;
+
+    // add additive terms to roll
     let i = 1;
     while (true) {
-        if(parsed["add" + i]) {
-            sum += parsed["add" + i];
+        if(interpretAttribute(parsed["add" + i])) {
+            sum += Number(interpretAttribute(parsed["add" + i]));
+        }
+        else break;
+        i++;
+    }
+
+    // multiply roll
+    i = 1;
+    while (true) {
+        if(interpretAttribute(parsed["mul" + i])) {
+            sum *= Number(interpretAttribute(parsed["mul" + i]));
+        }
+        else break;
+        i++;
+    }
+
+    // divide roll
+    i = 1;
+    while (true) {
+        if(interpretAttribute(parsed["div" + i])) {
+            sum /= Number(interpretAttribute(parsed["div" + i]));
+            sum = Math.floor(sum);
         }
         else break;
         i++;
@@ -45,6 +71,8 @@ function cmdRoll (parsed) {
 
     // creates return string
     let str = "You rolled " + sum + ". ";;
+
+    // formats first elements of sum composition
     if (parsed.numRolls != 1) {
         str += "(" + parsed["roll" + 1];
         for (let i = 2; i <= parsed.numRolls; i++) {
@@ -52,16 +80,19 @@ function cmdRoll (parsed) {
         }
         str += ")";
         if (parsed.add1) {
-            str += " + " + parsed.add1;
+            str += " + " + interpretAttribute(parsed.add1);
         }
     }
     else if(parsed.add1) {
-        str += "(" + parsed.sum + ")" + " + " + parsed.add1;
+        str += "(" + parsed.sum + ")" + " + " + interpretAttribute(parsed.add1);
     }
+    else 
+
+    // formats additional elements of sum composition
     i = 2;
     while (true) {
         if(parsed["add" + i]) {
-            str += " + " + parsed["add" + i];
+            str += " + " + interpretAttribute(parsed["add" + i]);
         }
         else break;
 
@@ -72,6 +103,7 @@ function cmdRoll (parsed) {
     return str;
 }
 
+// if user entered "char"
 function cmdChar (parsed) {
     if (parsed.arg1 === "new")
         return cmdCharTypes.cmdCharNew(parsed);
@@ -81,6 +113,8 @@ function cmdChar (parsed) {
         return cmdCharTypes.cmdCharInfo(parsed);
     else if (parsed.arg1 === "list")
         return cmdCharTypes.cmdCharList(parsed);
+    else if (parsed.arg1 === "select")
+        return cmdCharTypes.cmdCharSelect(parsed);
     else
         return "Error: invalid arguments."
 }
@@ -115,6 +149,31 @@ let cmdCharTypes = {
     cmdCharList (parsed) {
         return character.listChar(parsed);
     },
+
+    cmdCharSelect (parsed) {
+        if (parsed.arg2) {
+            return character.changeChar(parsed.arg2);
+        }
+        else {
+            return "Error: Invalid Arguments";
+        }
+    },
+}
+
+
+/* 
+ *  Private Helper Methods
+ */
+
+function interpretAttribute (att) {
+    if (typeof att === "string") {
+        let num = character.returnAttribute(att);
+        if (num) return num;
+    }
+    if (typeof att === "number") {
+        return att;
+    }
+    return null;
 }
 
 module.exports = {

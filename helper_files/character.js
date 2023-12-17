@@ -9,10 +9,10 @@ const fs = require('fs');                                               //filesy
 const prompt = require('prompt-sync')();                                //gets user input
 const charDataFile = './user_data/char_data.json';                      //where char data is stored
 
+
+
 // creates new character
 function newChar (name) {
-
-    
 
     // ensure charDataFile Exists
     if(!fs.existsSync(charDataFile) ) {
@@ -110,6 +110,36 @@ function listChar (parsed) {
     return currentChar.name + "\n";
 }
 
+// returns value of a specified attribute of the current character
+function returnAttribute (str) {
+    let char = currentChar();
+    try {
+        return char[str];
+    }
+    catch {
+        return null;
+    }
+}
+
+// selects a character
+function changeChar (char) {
+    let i;
+    let charFile = getCharDataFile();
+    const max = charFile.totalChar;
+
+    for (i = 1; i <= max; i++) {
+        const thisChar = charFile["char" + i];
+        if (thisChar.name === char) {
+            charFile.currentChar = i;
+            writeToCharDataFile(charFile);
+            return "Success! Current Character is " + char + ".";
+        }
+    }
+
+    return "Error: Character " + char + " not found.";
+
+}
+
 
 /*
  *  PRIVATE METHODS
@@ -149,4 +179,6 @@ module.exports = {
     editCharCustom: editCharCustom,
     listChar: listChar,
     infoChar: infoChar,
+    returnAttribute: returnAttribute,
+    changeChar: changeChar,
 }
